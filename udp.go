@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Dreamacro/go-shadowsocks2/socks"
+	"github.com/Potterli20/go-shadowsocks2/socks"
 )
 
 const udpBufSize = 64 * 1024
