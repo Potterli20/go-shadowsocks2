@@ -62,7 +62,7 @@ type PacketConn struct {
 
 const maxPacketSize = 64 * 1024
 
-var bufferPool = sync.Pool{New: func() interface{} { return make([]byte, maxPacketSize) }}
+var bufferPool = sync.Pool{New: func() any { return make([]byte, maxPacketSize) }}
 
 // NewPacketConn wraps a net.PacketConn with cipher
 func NewPacketConn(c net.PacketConn, ciph Cipher) *PacketConn {

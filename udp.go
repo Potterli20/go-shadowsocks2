@@ -11,7 +11,7 @@ import (
 
 const udpBufSize = 64 * 1024
 
-var bufPool = sync.Pool{New: func() interface{} { return make([]byte, udpBufSize) }}
+var bufPool = sync.Pool{New: func() any { return make([]byte, udpBufSize) }}
 
 // Listen on laddr for UDP packets, encrypt and send to server to reach target.
 func udpLocal(laddr, server, target string, shadow func(net.PacketConn) net.PacketConn) {

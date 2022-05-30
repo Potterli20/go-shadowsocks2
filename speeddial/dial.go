@@ -14,7 +14,7 @@ const penalty = 2 * time.Second
 
 const _Debug = false
 
-func logf(format string, v ...interface{}) {
+func logf(format string, v ...any) {
 	if _Debug {
 		log.Printf(format, v...)
 	}

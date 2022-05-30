@@ -18,7 +18,7 @@ const (
 var (
 	ErrZeroChunk = errors.New("zero chunk")
 
-	bufPool = sync.Pool{New: func() interface{} { return make([]byte, bufSize) }}
+	bufPool = sync.Pool{New: func() any { return make([]byte, bufSize) }}
 )
 
 type Writer struct {

@@ -18,7 +18,7 @@ var config struct {
 	UDPTimeout time.Duration
 }
 
-func logf(f string, v ...interface{}) {
+func logf(f string, v ...any) {
 	if config.Verbose {
 		log.Printf(f, v...)
 	}

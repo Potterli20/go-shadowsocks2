@@ -53,7 +53,7 @@ func NewPacketConn(c net.PacketConn, ciph Cipher) *PacketConn {
 
 const maxPacketSize = 64 * 1024
 
-var bufPool = sync.Pool{New: func() interface{} { return make([]byte, maxPacketSize) }}
+var bufPool = sync.Pool{New: func() any { return make([]byte, maxPacketSize) }}
 
 func (c *PacketConn) WriteTo(b []byte, addr net.Addr) (int, error) {
 	buf := bufPool.Get().([]byte)
