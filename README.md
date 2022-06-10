@@ -2,7 +2,9 @@
 
 A fresh implementation of Shadowsocks in Go.
 
-GoDoc at https://godoc.org/github.com/Dreamacro/go-shadowsocks2/
+https://pkg.go.dev/github.com/Potterli20/go-shadowsocks2
+
+fork https://github.com/Dreamacro/go-shadowsocks2/
 
 
 ## Features
