@@ -1,3 +1,27 @@
+# Shadowsocks in Go with SM4
+
+## Build
+
+```sh
+go build
+```
+
+## Server
+
+```sh
+go-shadowsocks -s 'ss://SM4_128_GCM:your-password@:8488'
+```
+
+### Client
+
+```sh
+go-shadowsocks2 -c 'ss://SM4_128_GCM:your-password@[server_address]:8488' -socks :1080
+```
+
+---
+
+## Original README:
+
 # go-shadowsocks2
 
 A fresh implementation of Shadowsocks in Go.
