@@ -15,7 +15,7 @@ go-shadowsocks -s 'ss://SM4_128_GCM:your-password@:8488'
 ### Client
 
 ```sh
-go-shadowsocks2 -c 'ss://SM4_128_GCM:your-password@[server_address]:8488' -socks :1080
+go-shadowsocks -c 'ss://SM4_128_GCM:your-password@[server_address]:8488' -socks :1080
 ```
 
 ---
