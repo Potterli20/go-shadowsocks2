@@ -2,6 +2,6 @@ module github.com/Potterli20/go-shadowsocks2
 
 go 1.18
 
-require golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
+require golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
 
-require golang.org/x/sys v0.0.0-20220721230656-c6bc011c0c49 // indirect
+require golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
