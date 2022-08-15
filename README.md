@@ -1,10 +1,8 @@
 # Shadowsocks in Go with SM4
 
-## Build
+Modified to support SM4 cipher.
 
-```sh
-go build
-```
+Merged upstream pull request of using outer keyfile.
 
 ## Server
 
@@ -15,7 +13,14 @@ go-shadowsocks -s 'ss://SM4_128_GCM:your-password@:8488'
 ### Client
 
 ```sh
-go-shadowsocks -c 'ss://SM4_128_GCM:your-password@[server_address]:8488' -socks :1080
+go-shadowsocks -c 'ss://SM4_128_GCM:your-password@[server_address]:8488' -socks 127.0.0.1:1080
+```
+
+### using keyfile
+
+```sh
+go-shadowsocks -keygen 32 > /path/to/keyfile
+go-shadowsocks -key-file /path/to/keyfile
 ```
 
 ---
@@ -30,7 +35,6 @@ GoDoc at https://godoc.org/github.com/shadowsocks/go-shadowsocks2/
 
 ![Build and test](https://github.com/shadowsocks/go-shadowsocks2/workflows/Build%20and%20test/badge.svg)
 
-
 ## Features
 
 - [x] SOCKS5 proxy with UDP Associate
@@ -40,7 +44,6 @@ GoDoc at https://godoc.org/github.com/shadowsocks/go-shadowsocks2/
 - [x] TCP tunneling (e.g. benchmark with iperf3)
 - [x] SIP003 plugins
 - [x] Replay attack mitigation
-
 
 ## Install
 
@@ -52,7 +55,6 @@ Install from source
 go get -u -v github.com/shadowsocks/go-shadowsocks2
 ```
 
-
 ## Basic Usage
 
 ### Server
@@ -63,12 +65,11 @@ Start a server listening on port 8488 using `AEAD_CHACHA20_POLY1305` AEAD cipher
 go-shadowsocks2 -s 'ss://AEAD_CHACHA20_POLY1305:your-password@:8488' -verbose
 ```
 
-
 ### Client
 
-Start a client connecting to the above server. The client listens on port 1080 for incoming SOCKS5 
-connections, and tunnels both UDP and TCP on port 8053 and port 8054 to 8.8.8.8:53 and 8.8.4.4:53 
-respectively. 
+Start a client connecting to the above server. The client listens on port 1080 for incoming SOCKS5
+connections, and tunnels both UDP and TCP on port 8053 and port 8054 to 8.8.8.8:53 and 8.8.4.4:53
+respectively.
 
 ```sh
 go-shadowsocks2 -c 'ss://AEAD_CHACHA20_POLY1305:your-password@[server_address]:8488' \
@@ -78,15 +79,12 @@ go-shadowsocks2 -c 'ss://AEAD_CHACHA20_POLY1305:your-password@[server_address]:8
 
 Replace `[server_address]` with the server's public address.
 
-
 ## Advanced Usage
-
 
 ### Netfilter TCP redirect on Linux
 
-The client offers `-redir` and `-redir6` (for IPv6) options to handle TCP connections 
+The client offers `-redir` and `-redir6` (for IPv6) options to handle TCP connections
 redirected by Netfilter on Linux. The feature works similar to `ss-redir` from `shadowsocks-libev`.
-
 
 Start a client listening on port 1082 for redirected TCP connections and port 1083 for redirected
 TCP IPv6 connections.
@@ -94,7 +92,6 @@ TCP IPv6 connections.
 ```sh
 go-shadowsocks2 -c 'ss://AEAD_CHACHA20_POLY1305:your-password@[server_address]:8488' -redir :1082 -redir6 :1083
 ```
-
 
 ### TCP tunneling
 
@@ -133,12 +130,14 @@ Client:
 go-shadowsocks2 -c 'ss://AEAD_CHACHA20_POLY1305:your-password@[server_address]:8488' \
     -verbose -socks :1080 -u -plugin v2ray
 ```
+
 Server:
 
 ```sh
 go-shadowsocks2 -s 'ss://AEAD_CHACHA20_POLY1305:your-password@:8488' -verbose \
     -plugin v2ray -plugin-opts "server"
 ```
+
 Note:
 
 It will look for the plugin in the current directory first, then `$PATH`.
