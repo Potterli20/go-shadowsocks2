@@ -28,7 +28,7 @@ openbsd-amd64:
 
 releases: all
 	chmod +x $(BINDIR)/$(NAME)-*
-	for name in $$(ls $(BINDIR)); do bsdtar -zcf $(RELDIR)/$$name-$(VER).gz $(BINDIR)/$$name; done
+	for name in $$(ls $(BINDIR)); do bsdtar -zcf $(RELDIR)/$$name-$(VER).tar.gz $(BINDIR)/$$name; done
 
 clean:
 	rm $(BINDIR)/*
