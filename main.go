@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/Potterli20/go-shadowsocks2/core"
-	"github.com/Potterli20/go-shadowsocks2/socks"
 )
 
 var config struct {
