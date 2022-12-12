@@ -45,7 +45,6 @@ func main() {
 		PluginOpts string
 	}
 
-	listCiphers := flag.Bool("cipher", false, "List supported ciphers")
 	flag.BoolVar(&config.Verbose, "verbose", false, "verbose mode")
 	flag.StringVar(&flags.Cipher, "cipher", "AEAD_CHACHA20_POLY1305", "available ciphers: "+strings.Join(core.ListCipher(), " "))
 	flag.StringVar(&flags.KeyFile, "key-file", "", "path of base64url-encoded key file")
@@ -78,7 +77,7 @@ func main() {
 		return
 	}
 
-	if len(flags.Client) == 0 && len(flags.Server) == 0 {
+	if flags.Client == "" && flags.Server == "" {
 		flag.Usage()
 		return
 	}
@@ -115,6 +114,7 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
+		}
 
 		udpAddr := addr
 
@@ -137,14 +137,10 @@ func main() {
 			}
 		}
 
-		d, err := fastdialer(flags.Client...)
-		if err != nil {
-			log.Fatalf("failed to create dialer: %v", err)
-		}
-
-		if len(flags.TCPTun) > 0 {
-			for _, p := range flags.TCPTun {
-				go tcpTun(p[0], p[1], d)
+		if flags.TCPTun != "" {
+			for _, tun := range strings.Split(flags.TCPTun, ",") {
+				p := strings.Split(tun, "=")
+				go tcpTun(p[0], addr, p[1], ciph.StreamConn)
 			}
 		}
 
@@ -157,24 +153,26 @@ func main() {
 		}
 
 		if flags.RedirTCP != "" {
-			go redirLocal(flags.RedirTCP, d)
+			go redirLocal(flags.RedirTCP, addr, ciph.StreamConn)
 		}
 
 		if flags.RedirTCP6 != "" {
-			go redir6Local(flags.RedirTCP6, d)
-		}
-
-		if flags.TproxyTCP != "" {
-			go tproxyTCP(flags.TproxyTCP, d)
+			go redir6Local(flags.RedirTCP6, addr, ciph.StreamConn)
 		}
 	}
 
-	if len(flags.Server) > 0 { // server mode
-		for _, each := range flags.Server {
-			addr, cipher, password, err := parseURL(each)
+	if flags.Server != "" { // server mode
+		addr := flags.Server
+		cipher := flags.Cipher
+		password := flags.Password
+		var err error
+
+		if strings.HasPrefix(addr, "ss://") {
+			addr, cipher, password, err = parseURL(addr)
 			if err != nil {
 				log.Fatal(err)
 			}
+		}
 
 		udpAddr := addr
 
@@ -216,33 +214,4 @@ func parseURL(s string) (addr, cipher, password string, err error) {
 		password, _ = u.User.Password()
 	}
 	return
-}
-
-type PairList [][2]string // key1=val1,key2=val2,...
-
-func (l PairList) String() string {
-	s := make([]string, len(l))
-	for i, pair := range l {
-		s[i] = pair[0] + "=" + pair[1]
-	}
-	return strings.Join(s, ",")
-}
-		
-func (l *PairList) Set(s string) error {
-	for _, item := range strings.Split(s, ",") {
-		pair := strings.Split(item, "=")
-		if len(pair) != 2 {
-			return nil
-		}
-		*l = append(*l, [2]string{pair[0], pair[1]})
-	}
-	return nil
-}
-
-type SpaceSeparatedList []string
-
-func (l SpaceSeparatedList) String() string { return strings.Join(l, " ") }
-func (l *SpaceSeparatedList) Set(s string) error {
-	*l = strings.Split(s, " ")
-	return nil
 }
