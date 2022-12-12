@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/Potterli20/go-shadowsocks2/core"
+	"github.com/Potterli20/go-shadowsocks2/socks"
 )
 
 var config struct {
@@ -226,6 +227,7 @@ func (l PairList) String() string {
 	}
 	return strings.Join(s, ",")
 }
+		
 func (l *PairList) Set(s string) error {
 	for _, item := range strings.Split(s, ",") {
 		pair := strings.Split(item, "=")
