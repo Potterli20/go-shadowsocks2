@@ -7,6 +7,8 @@ import (
 	"io"
 	"net"
 	"sync"
+
+	"github.com/Potterli20/go-shadowsocks2/internal"
 )
 
 const (
@@ -224,13 +226,16 @@ func (c *Conn) initReader() error {
 	if _, err := io.ReadFull(c.Conn, salt); err != nil {
 		return err
 	}
-
 	aead, err := c.Decrypter(salt)
 	if err != nil {
 		return err
 	}
 
-	c.r = NewReader(c.Conn, aead)
+	if internal.CheckSalt(salt) {
+		return ErrRepeatedSalt
+	}
+
+	c.r = newReader(c.Conn, aead)
 	return nil
 }
 
@@ -265,7 +270,8 @@ func (c *Conn) initWriter() error {
 	if err != nil {
 		return err
 	}
-	c.w = NewWriter(c.Conn, aead)
+	internal.AddSalt(salt)
+	c.w = newWriter(c.Conn, aead)
 	return nil
 }
 

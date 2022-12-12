@@ -1,18 +1,19 @@
 package main
 
 import (
-	"errors"
 	"net"
-	"syscall"
-	"unsafe"
 
 	"github.com/Potterli20/go-shadowsocks2/socks"
+	"github.com/Potterli20/go-shadowsocks2/nfutil"
 )
 
-const (
-	SO_ORIGINAL_DST      = 80 // from linux/include/uapi/linux/netfilter_ipv4.h
-	IP6T_SO_ORIGINAL_DST = 80 // from linux/include/uapi/linux/netfilter_ipv6/ip6_tables.h
-)
+func getOrigDst(c net.Conn, ipv6 bool) (socks.Addr, error) {
+	if tc, ok := c.(*net.TCPConn); ok {
+		addr, err := nfutil.GetOrigDst(tc, ipv6)
+		return socks.ParseAddr(addr.String()), err
+	}
+	panic("not a TCP connection")
+}
 
 // Listen on addr for netfilter redirected TCP connections
 func redirLocal(addr string, d Dialer) {

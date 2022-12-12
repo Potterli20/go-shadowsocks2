@@ -6,6 +6,8 @@ import (
 	"io"
 	"net"
 	"sync"
+
+	"github.com/Potterli20/go-shadowsocks2/internal"
 )
 
 // ErrShortPacket means that the packet is too short for a valid encrypted packet.
@@ -26,6 +28,8 @@ func Pack(dst, plaintext []byte, ciph Cipher) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	internal.AddSalt(salt)
+
 	if len(dst) < saltSize+len(plaintext)+aead.Overhead() {
 		return nil, io.ErrShortBuffer
 	}
@@ -44,6 +48,9 @@ func Unpack(dst, pkt []byte, ciph Cipher) ([]byte, error) {
 	aead, err := ciph.Decrypter(salt)
 	if err != nil {
 		return nil, err
+	}
+	if internal.CheckSalt(salt) {
+		return nil, ErrRepeatedSalt
 	}
 	if len(pkt) < saltSize+aead.Overhead() {
 		return nil, ErrShortPacket

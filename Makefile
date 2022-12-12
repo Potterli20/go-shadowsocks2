@@ -1,24 +1,35 @@
-NAME=shadowsocks2
+NAME=go-shadowsocks$(RELVER)
 BINDIR=bin
-GOBUILD=CGO_ENABLED=0 go build -ldflags '-w -s'
+RELDIR=release
+GOBUILD=CGO_ENABLED=0 go build -ldflags '-w -s -buildid='
+VER?=0
 # The -w and -s flags reduce binary sizes by excluding unnecessary symbols and debug info
+# The -buildid= flag makes builds reproducible
 
-all: linux macos win64
+all: linux-amd64 linux-arm64 linux-riscv64 linux-loong64 linux-mips64le openbsd-amd64
 
-linux:
+linux-amd64:
 	GOARCH=amd64 GOOS=linux $(GOBUILD) -o $(BINDIR)/$(NAME)-$@
 
-macos:
-	GOARCH=amd64 GOOS=darwin $(GOBUILD) -o $(BINDIR)/$(NAME)-$@
+linux-arm64:
+	GOARCH=arm64 GOOS=linux $(GOBUILD) -o $(BINDIR)/$(NAME)-$@
 
-win64:
-	GOARCH=amd64 GOOS=windows $(GOBUILD) -o $(BINDIR)/$(NAME)-$@.exe
+linux-riscv64:
+	GOARCH=riscv64 GOOS=linux $(GOBUILD) -o $(BINDIR)/$(NAME)-$@
 
-releases: linux macos win64
+linux-loong64:
+	GOARCH=loong64 GOOS=linux $(GOBUILD) -o $(BINDIR)/$(NAME)-$@
+
+linux-mips64le:
+	GOARCH=mips64le GOOS=linux $(GOBUILD) -o $(BINDIR)/$(NAME)-$@
+
+openbsd-amd64:
+	GOARCH=amd64 GOOS=openbsd $(GOBUILD) -o $(BINDIR)/$(NAME)-$@
+
+releases: all
 	chmod +x $(BINDIR)/$(NAME)-*
-	gzip $(BINDIR)/$(NAME)-linux
-	gzip $(BINDIR)/$(NAME)-macos
-	zip -m -j $(BINDIR)/$(NAME)-win64.zip $(BINDIR)/$(NAME)-win64.exe
+	for name in $$(ls $(BINDIR)); do bsdtar -zcf $(RELDIR)/$$name-$(VER).tar.gz $(BINDIR)/$$name; done
 
 clean:
 	rm $(BINDIR)/*
+	rm $(RELDIR)/*

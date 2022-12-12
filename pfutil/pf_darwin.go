@@ -1,19 +1,12 @@
-package main
+package pfutil
 
 import (
 	"net"
 	"syscall"
 	"unsafe"
-
-	"github.com/Potterli20/go-shadowsocks2/socks"
-	"github.com/Potterli20/go-shadowsocks2/pfutil"
 )
 
-func redirLocal(addr string, d Dialer)  { tcpLocal(addr, d, pfNatLookup) }
-func redir6Local(addr string, d Dialer) { panic("TCP6 redirect not supported") }
-func tproxyTCP(addr string, d Dialer)   { panic("TPROXY TCP not supported") }
-
-func pfNatLookup(c net.Conn) (socks.Addr, error) {
+func NatLookup(c *net.TCPConn) (*net.TCPAddr, error) {
 	const (
 		PF_INOUT     = 0
 		PF_IN        = 1
@@ -28,13 +21,11 @@ func pfNatLookup(c net.Conn) (socks.Addr, error) {
 		// #define DIOCNATLOOK		_IOWR('D', 23, struct pfioc_natlook)
 		DIOCNATLOOK = IOC_INOUT | ((LEN & IOCPARM_MASK) << 16) | ('D' << 8) | 23
 	)
-
 	fd, err := syscall.Open("/dev/pf", 0, syscall.O_RDONLY)
 	if err != nil {
 		return nil, err
 	}
 	defer syscall.Close(fd)
-
 	nl := struct { // struct pfioc_natlook
 		saddr, daddr, rsaddr, rdaddr       [16]byte
 		sxport, dxport, rsxport, rdxport   [4]byte
@@ -50,29 +41,11 @@ func pfNatLookup(c net.Conn) (socks.Addr, error) {
 	copy(nl.daddr[:], daddr.IP)
 	nl.sxport[0], nl.sxport[1] = byte(saddr.Port>>8), byte(saddr.Port)
 	nl.dxport[0], nl.dxport[1] = byte(daddr.Port>>8), byte(daddr.Port)
-
 	if _, _, errno := syscall.Syscall(syscall.SYS_IOCTL, uintptr(fd), DIOCNATLOOK, uintptr(unsafe.Pointer(&nl))); errno != 0 {
 		return nil, errno
 	}
-
-	addr := make([]byte, 1+net.IPv4len+2)
-	addr[0] = socks.AtypIPv4
-	copy(addr[1:1+net.IPv4len], nl.rdaddr[:4])
-	copy(addr[1+net.IPv4len:], nl.rdxport[:2])
-	return addr, nil
-
-func redirLocal(addr, server string, shadow func(net.Conn) net.Conn) {
-	tcpLocal(addr, server, shadow, natLookup)
-}
-
-func redir6Local(addr, server string, shadow func(net.Conn) net.Conn) {
-	panic("TCP6 redirect not supported")
-}
-
-func natLookup(c net.Conn) (socks.Addr, error) {
-	if tc, ok := c.(*net.TCPConn); ok {
-		addr, err := pfutil.NatLookup(tc)
-		return socks.ParseAddr(addr.String()), err
-	}
-	panic("not TCP connection")
+	var addr net.TCPAddr
+	addr.IP = nl.rdaddr[:4]
+	addr.Port = int(nl.rdxport[0])<<8 | int(nl.rdxport[1])
+	return &addr, nil
 }
