@@ -60,6 +60,7 @@ func pfNatLookup(c net.Conn) (socks.Addr, error) {
 	copy(addr[1:1+net.IPv4len], nl.rdaddr[:4])
 	copy(addr[1+net.IPv4len:], nl.rdxport[:2])
 	return addr, nil
+}
 
 func redirLocal(addr, server string, shadow func(net.Conn) net.Conn) {
 	tcpLocal(addr, server, shadow, natLookup)
