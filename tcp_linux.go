@@ -3,8 +3,8 @@ package main
 import (
 	"net"
 
-	"github.com/Potterli20/go-shadowsocks2/socks"
 	"github.com/Potterli20/go-shadowsocks2/nfutil"
+	"github.com/Potterli20/go-shadowsocks2/socks"
 )
 
 func getOrigDst(c net.Conn, ipv6 bool) (socks.Addr, error) {

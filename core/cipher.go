@@ -33,7 +33,7 @@ const (
 	aeadAes256Gcm         = "AEAD_AES_256_GCM"
 	aeadChacha20Poly1305  = "AEAD_CHACHA20_POLY1305"
 	aeadXChacha20Poly1305 = "AEAD_XCHACHA20_POLY1305"
-	sm4128Gcm        	 = "SM4_128_GCM"
+	sm4128Gcm             = "SM4_128_GCM"
 )
 
 // List of AEAD ciphers: key size in bytes and constructor
@@ -46,7 +46,7 @@ var aeadList = map[string]struct {
 	aeadAes256Gcm:         {32, shadowaead.AESGCM},
 	aeadChacha20Poly1305:  {32, shadowaead.Chacha20Poly1305},
 	aeadXChacha20Poly1305: {32, shadowaead.XChacha20Poly1305},
-	sm4128Gcm:	           {16, shadowaead.SM4GCM},
+	sm4128Gcm:             {16, shadowaead.SM4GCM},
 }
 
 // List of stream ciphers: key size in bytes and constructor

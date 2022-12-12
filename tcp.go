@@ -6,8 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net"
-	"sync"
-	"time"
 	"os"
 	"sync"
 	"time"
