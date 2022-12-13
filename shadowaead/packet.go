@@ -76,9 +76,9 @@ var bufferPool = sync.Pool{New: func() any { return make([]byte, maxPacketSize) 
 func NewPacketConn(c net.PacketConn, ciph Cipher) net.PacketConn {
 	const maxPacketSize = 64 * 1024
 	if cc, ok := c.(*net.UDPConn); ok {
-		return &udpConn{UDPConn: cc, Cipher: ciph, buf: make([]byte, maxPacketSize)}
+		return &UDPConn{UDPConn: cc, Cipher: ciph, buf: make([]byte, maxPacketSize)}
 	}
-	return &packetConn{PacketConn: c, Cipher: ciph, buf: make([]byte, maxPacketSize)}
+	return &PacketConn{PacketConn: c, Cipher: ciph, buf: make([]byte, maxPacketSize)}
 }
 
 // WriteTo encrypts b and write to addr using the embedded PacketConn.
