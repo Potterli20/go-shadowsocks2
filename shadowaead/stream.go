@@ -235,7 +235,7 @@ func (c *Conn) initReader() error {
 		return ErrRepeatedSalt
 	}
 
-	c.r = newReader(c.Conn, aead)
+	c.r = NewReader(c.Conn, aead)
 	return nil
 }
 
@@ -271,7 +271,7 @@ func (c *Conn) initWriter() error {
 		return err
 	}
 	internal.AddSalt(salt)
-	c.w = newWriter(c.Conn, aead)
+	c.w = NewWriter(c.Conn, aead)
 	return nil
 }
 
