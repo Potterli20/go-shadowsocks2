@@ -17,10 +17,12 @@ jobs:
 
       - name: go
         run: |
+          go clean -modcache
           go mod tidy -compat=1.24
           gofmt -w -r 'interface{} -> any' .
           go get -u
           go mod download
+          
       - name: Git push 
         run: |
           git init
