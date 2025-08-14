@@ -1,6 +1,6 @@
 module github.com/Potterli20/go-shadowsocks2
 
-go 1.25
+go 1.25.0
 
 tool golang.org/x/tools/cmd/stringer
 
